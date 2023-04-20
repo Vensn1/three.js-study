@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			/* css3盒子模型 */
+			box-sizing: border-box;
+		}
+	</style>
+	<body>
+		<div
+			style="
+				position: absolute;
+				width: 100%;
+				text-align: center;
+				color: red;
+				z-index: 99;
+			"
+		>
+			222
+		</div>
+		<div id="dom" style="position: absolute; background-color: pink"></div>
+		<!-- <script src="./build/three.js"></script>
+    <script>
+        console.log(THREE.Scene);
+    </script> -->
+		<!-- <script type="module">
+        // 现在浏览器支持ES6语法，自然包括import方式引入js文件
+        import * as THREE from './build/three.module.js';
+        console.log(THREE.Scene);
+
+        </script> -->
+
+		<!-- 具体路径配置，你根据自己文件目录设置，我的是课件中源码形式 -->
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "./build/three.module.js",
+					"three/addons/": "./examples/jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+			import * as THREE from "https://unpkg.com/three/build/three.module.js";
+
+			// three/addons/路径之后对应的是three.js官方文件包`/examples/jsm/`中的js库
+			// 扩展库OrbitControls.js
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+			// 扩展库GLTFLoader.js
+			import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+			// console.log(OrbitControls);
+			// console.log(GLTFLoader);
+			//引入性能监视器stats.js
+			import Stats from "three/addons/libs/stats.module.js";
+			// 引入dat.gui.js的一个类GUI
+			import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+
+			// 创建3D场景对象Scene
+			const scene = new THREE.Scene();
+			//创建两个网格模型mesh1、mesh2
+			const geometry = new THREE.BoxGeometry(50, 50, 50);
+			const material = new THREE.MeshLambertMaterial({color: 0x00ffff});
+			const group = new THREE.Group();
+			group.name='小区房子';
+			const mesh1 = new THREE.Mesh(geometry, material);
+			mesh1.name='一号楼';
+			const mesh2 = mesh1.clone()
+			mesh2.translateX(100)
+			// 把mesh1型,mesh2型插入到组group中，mesh1作为group的子对象
+			group.add(mesh1,mesh2);
+			
+			// threejs默认mesh也可以添加子对象,mesh基类也是Object3D
+			// mesh1.add(mesh2);
+			// const obj = new THREE.Object3D();//作为mesh1和mesh2的父对象
+			// obj.add(mesh1);
+			// 把group插入到场景中作为场景子对象
+			scene.add(group);
+			// 平移几何体的顶点坐标,改变几何体自身相对局部坐标原点的位置
+			geometry.translate(50/2,30,0,);
+			// .rotateY()默认绕几何体中心旋转，经过上面几何体平移变化，你会发现.rotateY()是绕长方体面上一条线旋转
+            mesh1.rotateY(Math.PI/3);
+			console.log(mesh1.position)
+
+			// 删除父对象group的子对象网格模型mesh1
+            group.remove(mesh1);
+			// mesh2.visible =false;// 隐藏一个网格模型，visible的默认值是true
+            // group.visible =false;// 隐藏一个包含多个模型的组对象group
+			// 注意如果mesh2和mesh的.material属性指向同一个材质，mesh2也会跟着mesh隐藏
+			mesh2.material.visible =false;
+
+			//沿着Y轴平移mesh1和mesh2的父对象，mesh1和mesh2跟着平移
+			// group.translateY(100);
+			//父对象缩放，子对象跟着缩放
+			// group.scale.set(4,4,4);
+			//父对象旋转，子对象跟着旋转
+			// group.rotateY(Math.PI/6)
+
+			// console.log(scene.position);
+
+			// 批量创建多个长方体表示高层楼
+			// const group1 = new THREE.Group(); //所有高层楼的父对象
+			// group1.name = "高层";
+			// for (let i = 0; i < 5; i++) {
+			// 	const geometry = new THREE.BoxGeometry(20, 60, 10);
+			// 	const material = new THREE.MeshLambertMaterial({
+			// 		color: 0x00ffff,
+			// 	});
+			// 	const mesh = new THREE.Mesh(geometry, material);
+			// 	mesh.position.x = i * 30; // 网格模型mesh沿着x轴方向阵列
+			// 	group1.add(mesh); //添加到组对象group1
+			// 	mesh.name = i + 1 + "号楼";
+			// 	// console.log('mesh.name',mesh.name);
+			// 	console.log(mesh.position)
+			// }
+			// group1.position.y = 30;
+
+			// const group2 = new THREE.Group();
+			// group2.name = "洋房";
+			// // 批量创建多个长方体表示洋房
+			// for (let i = 0; i < 5; i++) {
+			// 	const geometry = new THREE.BoxGeometry(20, 30, 10);
+			// 	const material = new THREE.MeshLambertMaterial({
+			// 		color: 0x00ffff,
+			// 	});
+			// 	const mesh = new THREE.Mesh(geometry, material);
+			// 	mesh.position.x = i * 30;
+			// 	group2.add(mesh); //添加到组对象group2
+			// 	mesh.name = i + 6 + "号楼";
+			// 	//可视化mesh的局部坐标系
+			// 	const meshAxesHelper = new THREE.AxesHelper(50);
+			// 	mesh.add(meshAxesHelper);
+			// }
+			// group2.position.z = 50;
+			// group2.position.y = 15;
+
+			// const model = new THREE.Group();
+			// model.name = "小区房子";
+			// model.add(group1, group2);
+			// model.position.set(-50, 0, -25);
+			// scene.add(model);
+
+			// // 递归遍历model包含所有的模型节点
+			// model.traverse(function (obj) {
+			// 	console.log("所有模型节点的名称", obj.name);
+			// 	// obj.isMesh：if判断模型对象obj是不是网格模型'Mesh'
+			// 	if (obj.isMesh) {
+			// 		//判断条件也可以是obj.type === 'Mesh'
+			// 		obj.material.color.set(0xffff00);
+			// 	}
+			// });
+			// // 返回名.name为"4号楼"对应的对象
+			// const nameNode = scene.getObjectByName("4号楼");
+			// nameNode.material.color.set(0xff0000);
+
+			// // 声明一个三维向量用来表示某个坐标
+			// const worldPosition = new THREE.Vector3();
+			// // 获取mesh的世界坐标，你会发现mesh的世界坐标受到父对象group的.position影响
+			// nameNode.getWorldPosition(worldPosition);
+			// console.log("世界坐标", worldPosition);
+			// console.log("本地坐标", nameNode.position);
+
+			// 查看子对象.children
+			// console.log("查看group的子对象", model.children);
+			// 查看Scene的子对象
+			// console.log("查看Scene的子对象", scene.children);
+
+			//环境光
+			const ambient = new THREE.AmbientLight(0x444444);
+			scene.add(ambient);
+			scene.remove(ambient);//移除场景中环境光
+
+
+			// 点光源
+			const point = new THREE.PointLight(0xffffff);
+			point.position.set(200, 400, 300); //点光源位置
+			scene.add(point); //点光源添加到场景中
+
+			//添加+3D坐标系
+			const axesHelper = new THREE.AxesHelper(150);
+			scene.add(axesHelper);
+
+			// width和height用来设置Three.js输出的Canvas画布尺寸(像素px)
+			const width = window.innerWidth; //宽度
+			const height = window.innerHeight; //高度
+			// 30:视场角度, width / height:Canvas画布宽高比, 1:近裁截面, 3000：远裁截面
+			// const camera = new THREE.PerspectiveCamera(30, width / height, 1, 3000);
+			const camera = new THREE.PerspectiveCamera(30, width / height, 1, 3000);
+			//相机在Three.js三维坐标系中的位置
+			// 根据需要设置相机位置具体值
+			camera.position.set(300, 300, 300);
+			//相机观察目标指向Threejs 3D空间中某个位置
+
+			camera.lookAt(0, 0, 0); //指向mesh对应的位置
+			// 创建渲染器对象
+			const renderer = new THREE.WebGLRenderer({
+				antialias: true, //是否抗锯齿
+				alpha: true, //画布透明
+			});
+
+			// 获取你屏幕对应的设备像素比.devicePixelRatio告诉threejs,以免渲染模糊问题
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setClearColor(0x444444, 1); //设置背景颜色
+			renderer.setSize(width, height); //设置three.js渲染区域的尺寸(像素px)
+			// renderer.render(scene, camera); //执行渲染操作
+			document.getElementById("dom").appendChild(renderer.domElement);
+
+			// 设置相机控件轨道控制器OrbitControls
+			const controls = new OrbitControls(camera, renderer.domElement);
+			controls.target.set(100, 0, 0); //更改相机lookAt位置
+			controls.update(); //update()函数内会执行camera.lookAt(controls.targe)
+			// 如果OrbitControls改变了相机参数，重新调用渲染器渲染三维场景
+			controls.addEventListener("change", function () {
+				renderer.render(scene, camera); //执行渲染操作
+				// console.log(pointLight.position);
+			}); //监听鼠标、键盘事件
+			window.onresize = function () {
+				// 重置渲染器输出画布canvas尺寸
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				// 全屏情况下：设置观察范围长宽比aspect为窗口宽高比
+				camera.aspect = window.innerWidth / window.innerHeight;
+				// 渲染器执行render方法的时候会读取相机对象的投影矩阵属性projectionMatrix
+				// 但是不会每渲染一帧，就通过相机的属性计算投影矩阵(节约计算资源)
+				// 如果相机的一些属性发生了变化，需要执行updateProjectionMatrix ()方法更新相机的投影矩阵
+				camera.updateProjectionMatrix();
+			};
+
+			//创建stats对象
+			const stats = new Stats();
+			//stats.domElement:web页面上输出计算结果,一个div元素，
+			document.body.appendChild(stats.domElement);
+			stats.setMode(1); //设置FPS帧率 MS一帧多少秒  MB已分配内存的 MB 字节（占用的内存大小）
+			// 渲染函数
+			function render() {
+				//requestAnimationFrame循环调用的函数中调用方法update(),来刷新时间
+				stats.update();
+				renderer.render(scene, camera); //执行渲染操作
+				// mesh1.rotateY(0.01); //每次绕y轴旋转0.01弧度
+				requestAnimationFrame(render); //请求再次执行渲染函数render，渲染下一帧
+			}
+			render();
+		</script>
+	</body>
+</html>
